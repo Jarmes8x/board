@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เกมหมาป่า - Werewolf Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🐺 เกมหมาป่า</h1>
+            <p style="color: rgba(255,255,255,0.8);">เกมสวมบทบาทที่ต้องใช้ไหวพริบและการสืบสวน</p>
+        </div>
+
+        <!-- หน้าหลัก -->
+        <div id="main-screen">
+            <div class="main-menu">
+                <button class="btn" onclick="showCreateRoom()">สร้างห้อง</button>
+                <button class="btn btn-secondary" onclick="showJoinRoom()">เข้าร่วมห้อง</button>
+            </div>
+
+            <div class="card">
+                <h2>ห้องที่เปิดอยู่</h2>
+                <div id="rooms-list">
+                    <p style="text-align: center; color: #636e72; padding: 20px;">ยังไม่มีห้องที่เปิดอยู่</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- สร้างห้อง -->
+        <div id="create-room-screen" class="hidden">
+            <div class="card">
+                <h2>สร้างห้องใหม่</h2>
+                <div class="form-group">
+                    <label>ชื่อห้อง:</label>
+                    <input type="text" id="room-name" placeholder="กรอกชื่อห้อง">
+                </div>
+                <div class="form-group">
+                    <label>ชื่อของคุณ:</label>
+                    <input type="text" id="host-name" placeholder="กรอกชื่อของคุณ">
+                </div>
+                <div class="form-group">
+                    <label>จำนวนผู้เล่นสูงสุด:</label>
+                    <select id="max-players">
+                        <option value="4">4 คน</option>
+                        <option value="6">6 คน</option>
+                        <option value="8" selected>8 คน</option>
+                        <option value="10">10 คน</option>
+                        <option value="12">12 คน</option>
+                    </select>
+                </div>
+                
+                <h3>กำหนดบทบาท</h3>
+                <div class="roles-config" id="roles-config">
+                    <!-- จะถูกสร้างโดย JavaScript -->
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn btn-success" onclick="createRoom()">สร้างห้อง</button>
+                    <button class="btn btn-secondary" onclick="showMainScreen()">ยกเลิก</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- เข้าร่วมห้อง -->
+        <div id="join-room-screen" class="hidden">
+            <div class="card">
+                <h2>เข้าร่วมห้อง</h2>
+                <div class="form-group">
+                    <label>ชื่อของคุณ:</label>
+                    <input type="text" id="player-name" placeholder="กรอกชื่อของคุณ">
+                </div>
+                <div class="form-group">
+                    <label>รหัสห้อง:</label>
+                    <input type="text" id="room-id" placeholder="กรอกรหัสห้อง">
+                </div>
+                <div style="text-align: center;">
+                    <button class="btn btn-success" onclick="joinRoom()">เข้าร่วม</button>
+                    <button class="btn btn-secondary" onclick="showMainScreen()">ยกเลิก</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ห้องรอ -->
+        <div id="room-screen" class="hidden">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 id="current-room-name"></h2>
+                    <div>
+                        <span id="room-code" style="background: #74b9ff; color: white; padding: 5px 10px; border-radius: 5px; margin-right: 10px;"></span>
+                        <button class="btn btn-danger" onclick="leaveRoom()">ออกจากห้อง</button>
+                    </div>
+                </div>
+                
+                <div id="host-controls" class="hidden" style="margin-bottom: 20px; text-align: center;">
+                    <button class="btn btn-success" onclick="startGame()">เริ่มเกม</button>
+                    <button class="btn btn-danger" onclick="deleteRoom()">ลบห้อง</button>
+                </div>
+                
+                <h3>ผู้เล่นในห้อง (<span id="player-count">0</span>/<span id="max-player-count">0</span>)</h3>
+                <div class="players-list" id="players-list"></div>
+                
+                <div style="margin-top: 20px;">
+                    <h3>บทบาทที่จะใช้ในเกม</h3>
+                    <div id="game-roles-display"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- หน้าเกม -->
+        <div id="game-screen" class="hidden">
+            <div class="card">
+                <div class="game-role">
+                    <div class="role-name" id="player-role"></div>
+                    <div class="role-description" id="role-description"></div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn" onclick="showRole()">ดูบทบาท</button>
+                    <button class="btn btn-secondary" onclick="backToRoom()">กลับห้องรอ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal สำหรับแสดงบทบาท -->
+    <div id="role-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2 id="modal-role-name"></h2>
+            <p id="modal-role-description"></p>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn" onclick="hideRoleModal()">ปิด</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"> </script>
+</body>
+</html>
